@@ -1,10 +1,15 @@
-import { Module } from '@nestjs/common';
+import {DynamicModule, Module} from '@nestjs/common';
 
-import { MetricsController } from './controllers/metrics.controller';
+import {MetricsController} from './controllers/metrics.controller';
 
-@Module({
-  imports: [],
-  controllers: [MetricsController],
-  providers: [],
-})
-export class ServerMetricsModule {}
+@Module({})
+export class ServerMetricsModule {
+  static forRoot(): DynamicModule {
+    return {
+      providers: [],
+      exports: [],
+      controllers: [MetricsController],
+      module: ServerMetricsModule,
+    };
+  }
+}

@@ -1,3 +1,4 @@
 import MiddlewareWrapper from './middleware-wrapper';
+import { ServerMetricsModule } from './nest/server-metrics.module';
 
-export default MiddlewareWrapper;
+export { MiddlewareWrapper, ServerMetricsModule };

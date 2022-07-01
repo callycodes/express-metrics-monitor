@@ -1,7 +1,7 @@
 {
-  "name": "microservice-status-monitor",
-  "version": "1.0.0",
-  "description": "Realtime Monitoring for microservice applications",
+  "name": "express-metrics-monitor",
+  "version": "1.1.0",
+  "description": "Realtime Monitoring for express node.js applications",
   "main": "build/index.js",
   "keywords": [
     "node",

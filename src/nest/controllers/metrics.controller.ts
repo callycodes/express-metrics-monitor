@@ -1,11 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ApiTags, } from '@nestjs/swagger';
 
 import * as os from 'os';
 import pidusage = require('pidusage');
 import * as v8 from 'v8';
 
-@ApiTags('server-metrics')
 @Controller('server-metrics')
 export class MetricsController {
   constructor() {}

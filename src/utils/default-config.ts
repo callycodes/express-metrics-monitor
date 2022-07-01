@@ -1,4 +1,6 @@
-module.exports = {
+import { Config } from "../interfaces/config.interface";
+
+const defaultConfig: Config = {
   title: 'Express Status',
   theme: 'default.css',
   path: '/status',
@@ -17,6 +19,12 @@ module.exports = {
       retention: 60,
     },
   ],
+  services: [
+    {
+      name: 'Core',
+      host: 'http://service-core',
+    },
+  ],
   port: null,
   websocket: null,
   iframe: false,
@@ -33,3 +41,5 @@ module.exports = {
   ignoreStartsWith: '/admin',
   healthChecks: [],
 };
+
+export default defaultConfig

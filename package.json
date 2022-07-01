@@ -1,21 +1,29 @@
 {
-  "name": "express-status-monitor",
-  "version": "1.3.4",
-  "description": "Realtime Monitoring for Express-based Node applications",
-  "main": "index.js",
-  "homepage": "https://dynobase.com",
+  "name": "microservice-status-monitor",
+  "version": "1.0.0",
+  "description": "Realtime Monitoring for microservice applications",
+  "main": "build/index.js",
   "keywords": [
     "node",
     "status",
     "monitoring",
     "express",
-    "charts"
+    "charts",
+    "nest",
+    "nestjs",
+    "microservice"
   ],
+  "types": "build/middleware-wrapper.d.ts",
   "engines": {
     "node": ">=8"
   },
-  "author": "Rafal Wilinski <raf.wilinski@gmail.com> (https://dynobase.com)",
+  "author": "Cal Bass <cal@cally.dev> (https://github.com/callycodes/)",
   "contributors": [
+    {
+      "name": "Rafal Wilinski",
+      "email": "raf.wilinski@gmail.com",
+      "url": "https://dynobase.com"
+    },
     {
       "name": "Julien Breux",
       "email": "julien.breux@gmail.com",
@@ -59,16 +67,17 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/RafalWilinski/express-status-monitor.git"
+    "url": "https://github.com/callycodes/nest-microservice-status-monitor.git"
   },
   "license": "MIT",
   "dependencies": {
-    "axios": "0.26.0",
+    "axios": "^0.26.0",
     "debug": "4.1.1",
     "handlebars": "^4.7.7",
     "on-headers": "1.0.2",
     "pidusage": "2.0.18",
-    "socket.io": "^4.4.1"
+    "socket.io": "^4.4.1",
+    "typescript": "^4.7.4"
   },
   "optionalDependencies": {
     "event-loop-stats": "1.2.0"
@@ -77,16 +86,14 @@
     "test-ci": "mocha --recursive",
     "test": "mocha --recursive --watch",
     "example": "npm i && npm i --prefix examples && npm start --prefix examples",
-    "eslint": "eslint ."
+    "eslint": "eslint .",
+    "build": "npm run tsc && cp -R ./src/public ./build",
+    "tsc": "tsc --project tsconfig.json"
   },
   "devDependencies": {
     "chai": "4.3.6",
     "eslint": "8.10.0",
     "mocha": "9.2.1",
     "sinon": "13.0.1"
-  },
-  "funding": {
-    "type": "individual",
-    "url": "http://dynobase.com/buy"
   }
 }

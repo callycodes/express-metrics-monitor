@@ -2,19 +2,21 @@
 
 'use strict';
 
+import { Config } from "../interfaces/config.interface";
+
 const socketIo = require('socket.io');
 const gatherOsMetrics = require('./gather-os-metrics');
 
 let io;
 
 const addSocketEvents = (socket, config) => {
-  socket.emit('esm_start', config.spans);
+  socket.emit('esm_start', { spans: config.spans, services: config.services });
   socket.on('esm_change', () => {
-    socket.emit('esm_start', config.spans);
+    socket.emit('esm_start', { spans: config.spans });
   });
 };
 
-module.exports = (server, config) => {
+module.exports = (server, config: Config) => {
   if (io === null || io === undefined) {
     if (config.websocket !== null) {
       io = config.websocket;
@@ -36,13 +38,15 @@ module.exports = (server, config) => {
       }
     });
 
-    config.spans.forEach(span => {
-      span.os = [];
-      span.responses = [];
-      const interval = setInterval(() => gatherOsMetrics(io, span), span.interval * 1000);
-
-      // Don't keep Node.js process up
-      interval.unref();
-    });
+    config.services.forEach(service => {
+      config.spans.forEach(span => {
+        span.os = [];
+        span.responses = [];
+        const interval = setInterval(() => gatherOsMetrics(io, span, service), span.interval * 1000);
+  
+        // Don't keep Node.js process up
+        interval.unref();
+      });
+    })
   }
 };

@@ -19,6 +19,10 @@ var socket = io(location.protocol + '//' + location.hostname + ':' + (port || lo
 });
 var defaultSpan = 0;
 var spans = [];
+
+var defaultService = 0;
+var services = [];
+
 var statusCodesColors = ['#75D701', '#47b8e0', '#ffc952', '#E53A40'];
 
 var defaultDataset = {
@@ -80,6 +84,8 @@ var eventLoopDataset = [Object.create(defaultDataset)];
 var responseTimeDataset = [Object.create(defaultDataset)];
 var rpsDataset = [Object.create(defaultDataset)];
 
+var serviceTitle = document.getElementById('serviceTitle');
+
 var cpuStat = document.getElementById('cpuStat');
 var memStat = document.getElementById('memStat');
 var loadStat = document.getElementById('loadStat');
@@ -137,7 +143,21 @@ var onSpanChange = function (e) {
     e.target.classList.add('active');
     defaultSpan = parseInt(e.target.id, 10);
 
-    var otherSpans = document.getElementsByTagName('span');
+    var otherSpans = document.getElementsByClassName('span-control');
+
+    for (var i = 0; i < otherSpans.length; i++) {
+        if (otherSpans[i] !== e.target) otherSpans[i].classList.remove('active');
+    }
+
+    socket.emit('esm_change');
+};
+
+var onServiceChange = function (e) {
+    e.target.classList.add('active');
+    defaultService = e.target.id.replace('-control-id', '')
+
+    serviceTitle.textContent = `${defaultService} Service`
+    var otherSpans = document.getElementsByClassName('service-control');
 
     for (var i = 0; i < otherSpans.length; i++) {
         if (otherSpans[i] !== e.target) otherSpans[i].classList.remove('active');
@@ -149,84 +169,90 @@ var onSpanChange = function (e) {
 socket.on('esm_start', function (data) {
     // Remove last element of Array because it contains malformed responses data.
     // To keep consistency we also remove os data.
-    data[defaultSpan].responses.pop();
-    data[defaultSpan].os.pop();
+    defaultService = data.services[0].name
+    serviceTitle.textContent = `${defaultService} Service`
 
-    var lastOsMetric = data[defaultSpan].os[data[defaultSpan].os.length - 1];
+    const socketSpans = data.spans;
+    const socketServices = data.services;
+
+    socketSpans[defaultSpan].responses.pop();
+    socketSpans[defaultSpan].os.pop();
+
+    var lastOsMetric = socketSpans[defaultSpan].os[socketSpans[defaultSpan].os.length - 1];
 
     cpuStat.textContent = '0.0%';
     if (lastOsMetric) {
         cpuStat.textContent = lastOsMetric.cpu.toFixed(1) + '%';
     }
 
-    cpuChart.data.datasets[0].data = data[defaultSpan].os.map(function (point) {
+    cpuChart.data.datasets[0].data = socketSpans[defaultSpan].os.map(function (point) {
         return point.cpu;
     });
-    cpuChart.data.labels = data[defaultSpan].os.map(addTimestamp);
+    cpuChart.data.labels = socketSpans[defaultSpan].os.map(addTimestamp);
 
     memStat.textContent = '0.0MB';
     if (lastOsMetric) {
         memStat.textContent = lastOsMetric.memory.toFixed(1) + 'MB';
     }
 
-    memChart.data.datasets[0].data = data[defaultSpan].os.map(function (point) {
+    memChart.data.datasets[0].data = socketSpans[defaultSpan].os.map(function (point) {
         return point.memory;
     });
-    memChart.data.labels = data[defaultSpan].os.map(addTimestamp);
+    memChart.data.labels = socketSpans[defaultSpan].os.map(addTimestamp);
 
     loadStat.textContent = '0.00';
     if (lastOsMetric) {
         loadStat.textContent = lastOsMetric.load[defaultSpan].toFixed(2);
     }
 
-    loadChart.data.datasets[0].data = data[defaultSpan].os.map(function (point) {
+    loadChart.data.datasets[0].data = socketSpans[defaultSpan].os.map(function (point) {
         return point.load[0];
     });
-    loadChart.data.labels = data[defaultSpan].os.map(addTimestamp);
+    loadChart.data.labels = socketSpans[defaultSpan].os.map(addTimestamp);
 
-    heapChart.data.datasets[0].data = data[defaultSpan].os.map(function (point) {
+    heapChart.data.datasets[0].data = socketSpans[defaultSpan].os.map(function (point) {
         return point.heap.used_heap_size / 1024 / 1024;
     });
-    heapChart.data.labels = data[defaultSpan].os.map(addTimestamp);
+    heapChart.data.labels = socketSpans[defaultSpan].os.map(addTimestamp);
 
-    eventLoopChart.data.datasets[0].data = data[defaultSpan].os.map(function (point) {
+    eventLoopChart.data.datasets[0].data = socketSpans[defaultSpan].os.map(function (point) {
         if (point.loop) {
             return point.loop.sum;
         }
         return 0;
     });
-    eventLoopChart.data.labels = data[defaultSpan].os.map(addTimestamp);
+    eventLoopChart.data.labels = socketSpans[defaultSpan].os.map(addTimestamp);
 
-    var lastResponseMetric = data[defaultSpan].responses[data[defaultSpan].responses.length - 1];
+    var lastResponseMetric = socketSpans[defaultSpan].responses[socketSpans[defaultSpan].responses.length - 1];
 
     responseTimeStat.textContent = '0.00ms';
     if (lastResponseMetric) {
         responseTimeStat.textContent = lastResponseMetric.mean.toFixed(2) + 'ms';
     }
 
-    responseTimeChart.data.datasets[0].data = data[defaultSpan].responses.map(function (point) {
+    responseTimeChart.data.datasets[0].data = socketSpans[defaultSpan].responses.map(function (point) {
         return point.mean;
     });
-    responseTimeChart.data.labels = data[defaultSpan].responses.map(addTimestamp);
+    responseTimeChart.data.labels = socketSpans[defaultSpan].responses.map(addTimestamp);
 
     for (var i = 0; i < 4; i++) {
-        statusCodesChart.data.datasets[i].data = data[defaultSpan].responses.map(function (point) {
+        statusCodesChart.data.datasets[i].data = socketSpans[defaultSpan].responses.map(function (point) {
             return point[i + 2];
         });
     }
-    statusCodesChart.data.labels = data[defaultSpan].responses.map(addTimestamp);
+    statusCodesChart.data.labels = socketSpans[defaultSpan].responses.map(addTimestamp);
 
-    if (data[defaultSpan].responses.length >= 2) {
+    if (socketSpans[defaultSpan].responses.length >= 2) {
         var deltaTime =
             lastResponseMetric.timestamp -
-            data[defaultSpan].responses[data[defaultSpan].responses.length - 2].timestamp;
+            socketSpans[defaultSpan].responses[socketSpans[defaultSpan].responses.length - 2].timestamp;
 
         if (deltaTime < 1) deltaTime = 1000;
         rpsStat.textContent = ((lastResponseMetric.count / deltaTime) * 1000).toFixed(2);
-        rpsChart.data.datasets[0].data = data[defaultSpan].responses.map(function (point) {
+        rpsChart.data.datasets[0].data = socketSpans[defaultSpan].responses.map(function (point) {
             return (point.count / deltaTime) * 1000;
         });
-        rpsChart.data.labels = data[defaultSpan].responses.map(addTimestamp);
+        rpsChart.data.labels = socketSpans[defaultSpan].responses.map(addTimestamp);
     }
 
     charts.forEach(function (chart) {
@@ -235,14 +261,17 @@ socket.on('esm_start', function (data) {
 
     var spanControls = document.getElementById('span-controls');
 
-    if (data.length !== spans.length) {
-        data.forEach(function (span, index) {
+    if (socketSpans.length !== spans.length) {
+        socketSpans.forEach(function (span, index) {
             spans.push({
                 retention: span.retention,
                 interval: span.interval,
             });
 
             var spanNode = document.createElement('span');
+
+            spanNode.className = 'span-control'
+
             var textNode = document.createTextNode((span.retention * span.interval) / 60 + 'M'); // eslint-disable-line
 
             spanNode.appendChild(textNode);
@@ -250,16 +279,37 @@ socket.on('esm_start', function (data) {
             spanNode.onclick = onSpanChange;
             spanControls.appendChild(spanNode);
         });
-        document.getElementsByTagName('span')[0].classList.add('active');
+        document.getElementsByClassName('span-control')[0].classList.add('active');
+    }
+
+    var serviceControls = document.getElementById('service-controls');
+
+    if (socketServices.length !== services.length) {
+        socketServices.forEach(function (service, index) {
+            services.push({
+                name: service.name,
+                host: service.host,
+            });
+
+            var serviceNode = document.createElement('span');
+
+            serviceNode.className = 'service-control'
+            var textNode = document.createTextNode(service.name); // eslint-disable-line
+
+            serviceNode.appendChild(textNode);
+            serviceNode.setAttribute('id', `${service.name}-control-id`);
+            serviceNode.onclick = onServiceChange;
+            serviceControls.appendChild(serviceNode);
+        });
+        document.getElementsByClassName('service-control')[0].classList.add('active');
     }
 });
 
 socket.on('esm_stats', function (data) {
-    console.log(data);
-
     if (
         data.retention === spans[defaultSpan].retention &&
-        data.interval === spans[defaultSpan].interval
+        data.interval === spans[defaultSpan].interval &&
+        data.service === defaultService
     ) {
         var os = data.os;
         var responses = data.responses;

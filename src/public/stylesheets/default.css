@@ -134,6 +134,17 @@ canvas {
   float: right;
 }
 
+.service-controls {
+  float: left;
+}
+
+.header {
+  display: flex;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  justify-content: space-between;
+}
+
 .status-code {
   margin-top: 2px;
 }

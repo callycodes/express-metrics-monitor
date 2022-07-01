@@ -1,4 +1,4 @@
-const defaultConfig = require('./default-config');
+import defaultConfig from '../utils/default-config'
 
 module.exports = config => {
   if (!config) {
@@ -46,5 +46,9 @@ module.exports = config => {
       ? config.healthChecks
       : defaultConfig.healthChecks
 
+  config.services =
+    Array.isArray(config.services)
+    ? config.services
+    : defaultConfig.services
   return config;
 };

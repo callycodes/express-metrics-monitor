@@ -1,3 +1,5 @@
+import { Config } from "./interfaces/config.interface";
+
 const fs = require('fs');
 const path = require('path');
 const onHeaders = require('on-headers');
@@ -7,7 +9,7 @@ const onHeadersListener = require('./helpers/on-headers-listener');
 const socketIoInit = require('./helpers/socket-io-init');
 const healthChecker = require('./helpers/health-checker');
 
-const middlewareWrapper = config => {
+const middlewareWrapper = (config: Config) => {
   const validatedConfig = validate(config);
   const bodyClasses = Object.keys(validatedConfig.chartVisibility)
     .reduce((accumulator, key) => {
@@ -22,9 +24,11 @@ const middlewareWrapper = config => {
     title: validatedConfig.title,
     port: validatedConfig.port,
     socketPath: validatedConfig.socketPath,
+    services: validatedConfig.services,
     bodyClasses,
     script: fs.readFileSync(path.join(__dirname, '/public/javascripts/app.js')),
-    style: fs.readFileSync(path.join(__dirname, '/public/stylesheets/', validatedConfig.theme))
+    style: fs.readFileSync(path.join(__dirname, '/public/stylesheets/', validatedConfig.theme)),
+    healthCheckResults: null,
   };
 
   const htmlTmpl = fs
@@ -84,4 +88,4 @@ const middlewareWrapper = config => {
   return middleware;
 };
 
-module.exports = middlewareWrapper;
+export default middlewareWrapper

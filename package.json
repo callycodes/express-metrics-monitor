@@ -94,7 +94,6 @@
     "test": "mocha --recursive --watch",
     "example": "npm i && npm i --prefix examples && npm start --prefix examples",
     "eslint": "eslint .",
-    "prepublishOnly": "npm run build",
     "build": "npm run build-esm && npm run build-cjs && npm run build-types",
     "build-esm": "npx tsc -p tsconfig-esm.json && cp -R ./src/public ./lib/esm",
     "build-cjs": "npx tsc -p tsconfig-cjs.json && cp -R ./src/public ./lib/cjs",

@@ -1,6 +1,6 @@
 {
   "name": "express-metrics-monitor",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Realtime Monitoring for express node.js applications",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
@@ -71,7 +71,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/callycodes/nest-microservice-status-monitor.git"
+    "url": "https://github.com/callycodes/express-metrics-monitor"
   },
   "license": "MIT",
   "dependencies": {

@@ -1,3 +1,6 @@
+type ChartVisibility = {
+    [key: string]: boolean
+}
 export interface Config {
     authorize?: any;
     title: string,
@@ -19,16 +22,7 @@ export interface Config {
     port?: number,
     websocket?: string,
     iframe?: boolean,
-    chartVisibility: {
-      cpu: boolean,
-      mem: boolean,
-      load: boolean,
-      heap: boolean,
-      eventLoop: boolean,
-      responseTime: boolean,
-      rps: boolean,
-      statusCodes: boolean,
-    },
+    chartVisibility: ChartVisibility,
     ignoreStartsWith: string,
     healthChecks: any[],
   };

@@ -1,20 +1,18 @@
 import { requestMetrics } from "./request-metrics";
 
-const pidusage = require('pidusage');
-const os = require('os');
-const v8 = require('v8');
-const sendMetrics = require('./send-metrics');
-const debug = require('debug')('express-status-monitor');
+import { sendMetrics } from './send-metrics';
 
-let eventLoopStats; // eslint-disable-line
+// let eventLoopStats; // eslint-disable-line
 
-try {
+/* try {
   eventLoopStats = require('event-loop-stats'); // eslint-disable-line
 } catch (error) {
   console.warn('event-loop-stats not found, ignoring event loop metrics...');
-}
+} */
 
-module.exports = async (io, span, service) => {
+export const gatherOsMetrics = async (io: any, span: any, service: any) => {
+  try {
   const collectedMetrics = await requestMetrics(service.host, span)
   sendMetrics(io, collectedMetrics.data, service)
+  } catch (err) {}
 };

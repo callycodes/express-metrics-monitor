@@ -45,7 +45,7 @@ canvas {
 }
 
 .content {
-  width: 600px;
+  width: 800px;
   margin: auto;
 }
 
@@ -54,7 +54,7 @@ canvas {
 }
 
 .stats-column {
-  flex: 0 0 200px;
+  flex: 0 0 350px;
 }
 
 .container {
@@ -65,7 +65,7 @@ canvas {
 }
 
 .chart-container {
-  width: 400px;
+  width: 450px;
   height: 100px;
 }
 

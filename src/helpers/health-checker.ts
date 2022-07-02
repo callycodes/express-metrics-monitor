@@ -1,9 +1,7 @@
-'use strict';
+import { default as axios } from 'axios';
 
-const axios = require('axios');
-
-function allSettled (promises) {
-  const wrappedPromises = promises.map(p => Promise.resolve(p)
+function allSettled (promises: any) {
+  const wrappedPromises = promises.map((p: any) => Promise.resolve(p)
     .then(
       val => ({ state: 'fulfilled', value: val }),
       err => ({ state: 'rejected', reason: err })
@@ -14,10 +12,10 @@ function allSettled (promises) {
 }
 
 
-module.exports = async healthChecks => {
-  const checkPromises = [];
+export const healthChecker = async (healthChecks: any) => {
+  const checkPromises: any[] = [];
 
-  (healthChecks || []).forEach(healthCheck => {
+  (healthChecks || []).forEach((healthCheck: any) => {
     let uri = `${healthCheck.protocol}://${healthCheck.host}`;
 
     if (healthCheck.port) {
@@ -32,7 +30,7 @@ module.exports = async healthChecks => {
     }));
   });
 
-  const checkResults = [];
+  const checkResults: any[] = [];
 
   return allSettled(checkPromises).then(results => {
     results.forEach((result, index) => {

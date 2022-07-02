@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 
 import * as os from 'os';
-import pidusage = require('pidusage');
+import { default as pidusage }  from 'pidusage';
 import * as v8 from 'v8';
+var eventLoopStats = require('event-loop-stats');
 
 @Controller('server-metrics')
 export class MetricsController {
@@ -10,7 +11,6 @@ export class MetricsController {
 
   @Post()
   async getServerMetrics(@Body() span: any) {
-    console.log('collect pid usage endpoint hit');
     const defaultResponse = {
       2: 0,
       3: 0,
@@ -27,8 +27,9 @@ export class MetricsController {
       timestamp: null,
       heap: null,
     };
+
     const stat = await pidusage(process.pid);
-    // console.log(stat)
+
     const last = span.responses[span.responses.length - 1];
 
     // Convert from B to MB
@@ -38,17 +39,15 @@ export class MetricsController {
     stats.timestamp = Date.now();
     stats.heap = v8.getHeapStatistics();
 
-    /*if (eventLoopStats) {
-        stat.loop = eventLoopStats.sense();
-      }*/
+    if (eventLoopStats) {
+      stats.loop = eventLoopStats.sense();
+    }
 
     span.os.push(stats);
-    console.log(span.os.length);
     if (
       !span.responses[0] ||
       (last.timestamp + span.interval) * 1000 < Date.now()
     ) {
-      console.log('Pushing default response');
       span.responses.push(defaultResponse);
     }
 

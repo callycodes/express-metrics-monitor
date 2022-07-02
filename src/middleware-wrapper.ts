@@ -1,18 +1,19 @@
 import { Config } from "./interfaces/config.interface";
 
-const fs = require('fs');
-const path = require('path');
-const onHeaders = require('on-headers');
-const Handlebars = require('handlebars');
-const validate = require('./helpers/validate');
-const onHeadersListener = require('./helpers/on-headers-listener');
-const socketIoInit = require('./helpers/socket-io-init');
-const healthChecker = require('./helpers/health-checker');
+import * as fs from 'fs';
+import * as path from 'path';
+import { default as onHeaders } from 'on-headers';
+
+import * as Handlebars from 'handlebars';
+import { validate } from './helpers/validate';
+import { onHeadersListener } from './helpers/on-headers-listener';
+import { socketIoInit } from './helpers/socket-io-init';
+import { healthChecker } from './helpers/health-checker';
 
 const middlewareWrapper = (config: Config) => {
   const validatedConfig = validate(config);
   const bodyClasses = Object.keys(validatedConfig.chartVisibility)
-    .reduce((accumulator, key) => {
+    .reduce((accumulator: string[], key) => {
       if (validatedConfig.chartVisibility[key] === false) {
         accumulator.push(`hide-${key}`);
       }
@@ -28,7 +29,7 @@ const middlewareWrapper = (config: Config) => {
     bodyClasses,
     script: fs.readFileSync(path.join(__dirname, '/public/javascripts/app.js')),
     style: fs.readFileSync(path.join(__dirname, '/public/stylesheets/', validatedConfig.theme)),
-    healthCheckResults: null,
+    healthCheckResults: <any>[],
   };
 
   const htmlTmpl = fs
@@ -37,7 +38,7 @@ const middlewareWrapper = (config: Config) => {
 
   const render = Handlebars.compile(htmlTmpl);
 
-  const middleware = (req, res, next) => {
+  const middleware = (req: any, res: any, next: any) => {
     socketIoInit(req.socket.server, validatedConfig);
 
     const startTime = process.hrtime();
@@ -79,7 +80,7 @@ const middlewareWrapper = (config: Config) => {
    * discussion: https://github.com/RafalWilinski/express-status-monitor/issues/63
    */
   middleware.middleware = middleware;
-  middleware.pageRoute = (req, res) => {
+  middleware.pageRoute = (req: any, res: any) => {
     healthChecker(validatedConfig.healthChecks).then(results => {
       data.healthCheckResults = results;
       res.send(render(data));

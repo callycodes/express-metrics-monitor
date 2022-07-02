@@ -1,4 +1,4 @@
-module.exports = (io, span, service) => {
+export const sendMetrics = (io: any, span: any, service: any) => {
   io.emit('esm_stats', {
     os: span.os[0],
     responses: span.responses[span.responses.length - 2],

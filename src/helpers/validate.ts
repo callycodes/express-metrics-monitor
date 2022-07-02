@@ -1,12 +1,13 @@
+import { Config } from '../interfaces/config.interface';
 import defaultConfig from '../utils/default-config'
 
-module.exports = config => {
+export const validate = (config: Config) => {
   if (!config) {
     return defaultConfig;
   }
 
-  const mungeChartVisibility = configChartVisibility => {
-    Object.keys(defaultConfig.chartVisibility).forEach(key => {
+  const mungeChartVisibility = (configChartVisibility: any) => {
+    Object.keys(defaultConfig.chartVisibility).forEach((key: string) => {
       if (configChartVisibility[key] === false) {
         defaultConfig.chartVisibility[key] = false;
       }

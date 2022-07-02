@@ -25,8 +25,8 @@ const defaultConfig: Config = {
       host: 'http://service-core',
     },
   ],
-  port: null,
-  websocket: null,
+  port: undefined,
+  websocket: undefined,
   iframe: false,
   chartVisibility: {
     cpu: true,

@@ -3,7 +3,6 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import * as os from 'os';
 import { default as pidusage }  from 'pidusage';
 import * as v8 from 'v8';
-var eventLoopStats = require('event-loop-stats');
 
 @Controller('server-metrics')
 export class MetricsController {
@@ -38,6 +37,14 @@ export class MetricsController {
     stats.load = os.loadavg();
     stats.timestamp = Date.now();
     stats.heap = v8.getHeapStatistics();
+
+    let eventLoopStats
+
+    try {
+      eventLoopStats = require('event-loop-stats'); // eslint-disable-line
+    } catch (error) {
+      console.warn('event-loop-stats not found, ignoring event loop metrics...');
+    }
 
     if (eventLoopStats) {
       stats.loop = eventLoopStats.sense();

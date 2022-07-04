@@ -38,17 +38,17 @@ export class MetricsController {
     stats.timestamp = Date.now();
     stats.heap = v8.getHeapStatistics();
 
-    let eventLoopStats
+    // let eventLoopStats
 
-    try {
+    /*try {
       eventLoopStats = require('event-loop-stats'); // eslint-disable-line
     } catch (error) {
       console.warn('event-loop-stats not found, ignoring event loop metrics...');
-    }
+    }*/
 
-    if (eventLoopStats) {
+    /*if (eventLoopStats) {
       stats.loop = eventLoopStats.sense();
-    }
+    }*/
 
     span.os.push(stats);
     if (
